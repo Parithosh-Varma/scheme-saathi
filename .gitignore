@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite*
+chroma_db/
+.env
+!.env.example
+node_modules/
+.next/
+dist/
+.DS_Store
+*.log

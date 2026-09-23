@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./data:/app/data
+      - chroma:/app/chroma_db
+      - ./backend/schemesaathi.db:/app/schemesaathi.db
+    environment:
+      - CHROMA_PERSIST_DIR=/app/chroma_db
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+volumes:
+  chroma:
