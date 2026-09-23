@@ -160,7 +160,7 @@ async def demo(query: Optional[str] = Form(None), audio: Optional[UploadFile] = 
     else:
         raise HTTPException(400, "Send 'query' text field or 'audio' file.")
     try:
-        result = run_rag(qtext)
+        result = run_rag(qtext, channel="demo")
     except Exception as e:
         raise HTTPException(500, f"RAG failed: {e}")
     lang = result.get("language_detected", detect_language(qtext))

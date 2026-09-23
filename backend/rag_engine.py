@@ -95,7 +95,7 @@ def _gemini_refine(query: str, profile: dict, candidates: list, lang: str) -> Op
         return None
 
 
-def run_rag(query: str) -> dict:
+def run_rag(query: str, channel: str = "whatsapp") -> dict:
     from .voice_pipeline import detect_language
     lang = detect_language(query)
     profile = extract_profile(query)
@@ -121,12 +121,18 @@ def run_rag(query: str) -> dict:
             "confidence": item["score"],
         })
     greet = VOICE_GREETINGS.get(lang, VOICE_GREETINGS["hi"])
+    if channel == "telegram":
+        where_hi, where_en = "Details isi chat mein upar bhej di hain.", "Details sent in the message above."
+    elif channel == "demo":
+        where_hi, where_en = "Details neeche di gayi hain.", "Details listed below."
+    else:
+        where_hi, where_en = "Details WhatsApp par bhej di hain.", "Details sent below."
     if schemes_out:
         names = ", ".join([x["name"] for x in schemes_out[:2]])
         if lang == "hi":
-            voice = f"{greet}Aapke liye {len(schemes_out)} yojanayein mili hain. Sabse achhi: {names}. Details WhatsApp par bhej di hain."
+            voice = f"{greet}Aapke liye {len(schemes_out)} yojanayein mili hain. Sabse achhi: {names}. {where_hi}"
         else:
-            voice = f"{greet}I found {len(schemes_out)} schemes for you. Top match: {names}. Details sent below."
+            voice = f"{greet}I found {len(schemes_out)} schemes for you. Top match: {names}. {where_en}"
     else:
         voice = (f"{greet}Maaf kijiye, is jaankari par koi yojana nahi mili. Kripya apni umr, kaam aur gaon ke baare mein aur batayein."
                  if lang == "hi" else f"{greet}I couldn't find a scheme for this. Please tell me more about your age, work and location.")

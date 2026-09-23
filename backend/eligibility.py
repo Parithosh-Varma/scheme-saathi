@@ -153,6 +153,11 @@ def score_scheme(scheme: dict, profile: dict):
                 score += 0.15
                 reasons.append(f"{key} match")
                 break
+    # Loan schemes need business intent; otherwise cap so relevant schemes rank higher
+    cats = [str(c).lower() for c in scheme.get("category", [])]
+    if "loan" in cats and not profile.get("occupation"):
+        if not any(k in q for k in ["business", "vyapar", "dukaan", "shop", "loan", "udyog", "startup", "vendor", "rehdi", "thela", "mudra"]):
+            score = min(score, 0.5)
     return min(1.0, score), "; ".join(reasons) or "general match"
 
 

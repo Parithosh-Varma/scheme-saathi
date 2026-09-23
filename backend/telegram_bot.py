@@ -89,7 +89,7 @@ def handle_message(token: str, msg: dict):
         send_long(token, chat_id, "Kripya text ya voice note bhejein.")
         return
     try:
-        result = run_rag(query)
+        result = run_rag(query, channel="telegram")
     except Exception as e:
         send_long(token, chat_id, f"Maaf kijiye, kuch problem hui: {e}")
         return
