@@ -80,18 +80,16 @@ def retrieve(query: str, k: int = 5) -> list:
 
 
 def _gemini_refine(query: str, profile: dict, candidates: list, lang: str) -> Optional[dict]:
-    key = os.getenv("GEMINI_API_KEY", "")
-    if not key:
-        return None
+    # Free path: opencode-proxy (OpenAI-compatible) → direct Gemini → None (rule-based output)
     try:
-        import google.generativeai as genai
+        from .llm import chat
         from .prompts import RAG_SYSTEM_PROMPT
-        genai.configure(api_key=key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
         docs = "\n".join([f"- {c['scheme_id']}: {c['name_en']} | {c['description']} | Benefit: {c['benefit_amount']} | Criteria: {json.dumps(c['eligibility_criteria'])} | Docs: {', '.join(c['documents_required'])} | URL: {c['application_url']}" for c in candidates])
         prompt = RAG_SYSTEM_PROMPT + f"\n\nUser query: {query}\nExtracted profile: {json.dumps(profile)}\nRetrieved documents:\n{docs}\n\nReturn strict JSON only."
-        r = model.generate_content(prompt, request_options={"timeout": 10})
-        text = (r.text or "").strip().replace("```json", "").replace("```", "").strip()
+        text = chat(prompt, timeout=30)
+        if not text:
+            return None
+        text = text.strip().replace("```json", "").replace("```", "").strip()
         return json.loads(text)
     except Exception:
         return None

@@ -51,16 +51,11 @@ def synthesize_speech(text: str, language: str = "hi") -> bytes:
 
 
 def translate_text(text: str, source_lang: str, target_lang: str) -> str:
-    import os
-    key = os.getenv("GEMINI_API_KEY", "")
-    if not key or source_lang == target_lang:
+    if source_lang == target_lang:
         return text
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        r = model.generate_content(f"Translate from {source_lang} to {target_lang}. Return only translation:\n{text}",
-                                    request_options={"timeout": 10})
-        return (r.text or text).strip()
+        from .llm import chat
+        out = chat(f"Translate from {source_lang} to {target_lang}. Return only translation:\n{text}", timeout=15)
+        return out.strip() if out else text
     except Exception:
         return text
