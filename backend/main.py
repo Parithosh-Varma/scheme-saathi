@@ -65,6 +65,12 @@ except Exception:
     pass
 
 
+@app.get("/")
+def root():
+    return {"service": "SchemeSaathi", "docs": "/docs", "health": "/health",
+            "demo": "POST /api/demo", "analytics": "/api/analytics"}
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "SchemeSaathi"}
